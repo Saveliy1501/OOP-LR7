@@ -42,6 +42,14 @@ paths:
         name: lon
         required: true
         type: string
+      - description: Weather provider
+        enum:
+        - openweather
+        - openmeteo
+        in: query
+        name: provider
+        required: true
+        type: string
       produces:
       - application/json
       responses:

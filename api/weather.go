@@ -6,18 +6,17 @@ import (
 	weather "models/weather"
 	"shared/responses"
 	"shared/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 )
  
-type WeatherHandler struct {
-	Controller controllers.CurrentWeatherController[*clients.OpenWeatherClient]
-}
+type WeatherHandler struct {}
+	
 
 func NewCurrentWeatherHandler() *WeatherHandler {
-	return &WeatherHandler{Controller: *controllers.NewCurrentWeatherController(
-		clients.NewOpenWeatherClient(utils.GetEnv("OPENWEATHER_API_KEY", ""), utils.GetEnv("OPENWEATHER_BASE_URL", "")))}
+	return &WeatherHandler{}
 }
 
 // GetCurrentWeather godoc
@@ -27,6 +26,7 @@ func NewCurrentWeatherHandler() *WeatherHandler {
 // @Produce      json
 // @Param        lat   query     string  true  "Latitude"    default(18.300231990440125)
 // @Param        lon   query     string  true  "Longitude"   default(-64.8251590359234)
+// @Param        provider query     string  true  "Weather provider" Enums(openweather, openmeteo)
 // @Success      200   {object}  responses.SuccessResponse[weather.CurrentWeather]
 // @Failure      400   {object}  responses.StatusResponse
 // @Failure      500   {object}  responses.StatusResponse
@@ -40,7 +40,33 @@ func (h *WeatherHandler) HandleGetCurrentWeather(c *gin.Context) {
 		return
 	}
 
-	result, err := h.Controller.GetCurrentWeather(lat, lon)
+	providerParam := c.Query("provider")
+	if providerParam == "" {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "missing provider parameter"})
+		return
+	}
+
+	providerParam = strings.ToLower(providerParam)
+
+	var weatherClient clients.WeatherDataClient
+
+	switch providerParam {
+	case "openmeteo":
+		weatherClient = clients.NewOpenMeteoClient(
+			utils.GetEnv("OPENMETEO_BASE_URL", "https://api.open-meteo.com/v1/forecast"),
+		)
+	case "openweather":
+		weatherClient = clients.NewOpenWeatherClient(
+			utils.GetEnv("OPENWEATHER_API_KEY", ""),
+			utils.GetEnv("OPENWEATHER_BASE_URL", "https://api.openweathermap.org/data/2.5/weather"),
+		)
+	default:
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "unknown provider: " + providerParam})
+		return
+	}
+
+	controller := controllers.NewCurrentWeatherController(weatherClient)
+	result, err := controller.GetCurrentWeather(lat, lon)
 
 	if err != nil {
 

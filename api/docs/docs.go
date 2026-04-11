@@ -41,6 +41,17 @@ const docTemplate = `{
                         "name": "lon",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "enum": [
+                            "openweather",
+                            "openmeteo"
+                        ],
+                        "type": "string",
+                        "description": "Weather provider",
+                        "name": "provider",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
