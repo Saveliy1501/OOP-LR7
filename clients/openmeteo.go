@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"models/weather"
 
 	"github.com/shopspring/decimal"
 )
@@ -48,3 +49,5 @@ func (c *OpenMeteoClient) LocationCurrentTemperature(lat decimal.Decimal, lon de
 
 	return data.CurrentWeather.Temperature, nil
 }
+
+func (c *OpenMeteoClient)LocationForecast(lat decimal.Decimal, lon decimal.Decimal) ([]weather.DailyForecast, error) {return nil,nil}

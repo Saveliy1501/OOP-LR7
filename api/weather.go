@@ -75,3 +75,19 @@ func (h *WeatherHandler) HandleGetCurrentWeather(c *gin.Context) {
 	}
 	c.JSON(200, responses.SuccessResponse[weather.CurrentWeather]{Code: 200, Message: "Success", Data: result})
 }
+// HandleGetForecast godoc
+// @Summary      Get Weather Forecast
+// @Description  Returns weather forecast for 5 days
+// @Tags         weather
+// @Produce      json
+// @Param        lat      query     string  true  "Latitude"
+// @Param        lon      query     string  true  "Longitude"
+// @Param        provider query     string  true  "Weather provider" Enums(openweather, openmeteo)
+// @Success      200      {object}  responses.SuccessResponse[[]weather.DailyForecast]
+// @Failure      400      {object}  responses.StatusResponse
+// @Failure      500      {object}  responses.StatusResponse
+// @Router       /weather/forecast [get]
+func (h *WeatherHandler) HandleGetForecast(c *gin.Context) {
+	// TODO: реализация будет позже
+	c.JSON(501, responses.StatusResponse{Code: 501, Message: "not implemented"})
+}

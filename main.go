@@ -28,6 +28,7 @@ func main() {
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/weather", currentWeatherHandler.HandleGetCurrentWeather)
+		v1.GET("/weather/forecast", currentWeatherHandler.HandleGetForecast)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
