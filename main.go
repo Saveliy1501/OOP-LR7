@@ -30,6 +30,7 @@ func main() {
 		v1.GET("/weather", currentWeatherHandler.HandleGetCurrentWeather)
 		v1.GET("/weather/forecast", currentWeatherHandler.HandleGetForecast)
 		v1.POST("/weather/multiple", currentWeatherHandler.HandleGetMultipleLocations)
+		v1.GET("/weather/city", currentWeatherHandler.HandleGetWeatherByCity)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

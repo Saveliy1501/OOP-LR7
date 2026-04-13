@@ -204,3 +204,7 @@ func (h *WeatherHandler) HandleGetMultipleLocations(c *gin.Context) {
 	})
 }
 
+func (h *WeatherHandler) HandleGetWeatherByCity(c *gin.Context) {
+	c.JSON(501, responses.StatusResponse{Code: 501, Message: "not implemented"})
+}
+
