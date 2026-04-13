@@ -11,9 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 )
- 
-type WeatherHandler struct {}
-	
+
+type WeatherHandler struct{}
 
 func NewCurrentWeatherHandler() *WeatherHandler {
 	return &WeatherHandler{}
@@ -55,7 +54,7 @@ func (h *WeatherHandler) HandleGetCurrentWeather(c *gin.Context) {
 		weatherClient = clients.NewOpenMeteoClient(
 			utils.GetEnv("OPENMETEO_BASE_URL", "https://api.open-meteo.com/v1/forecast"),
 		)
-	case "openweather":
+	case "openweather": 
 		weatherClient = clients.NewOpenWeatherClient(
 			utils.GetEnv("OPENWEATHER_API_KEY", ""),
 			utils.GetEnv("OPENWEATHER_BASE_URL", "https://api.openweathermap.org/data/2.5/weather"),
@@ -75,19 +74,72 @@ func (h *WeatherHandler) HandleGetCurrentWeather(c *gin.Context) {
 	}
 	c.JSON(200, responses.SuccessResponse[weather.CurrentWeather]{Code: 200, Message: "Success", Data: result})
 }
+
 // HandleGetForecast godoc
 // @Summary      Get Weather Forecast
 // @Description  Returns weather forecast for 5 days
 // @Tags         weather
 // @Produce      json
-// @Param        lat      query     string  true  "Latitude"
-// @Param        lon      query     string  true  "Longitude"
+// @Param        lat      query     string  true  "Latitude" default(53.9)
+// @Param        lon      query     string  true  "Longitude" default(27.5667)
 // @Param        provider query     string  true  "Weather provider" Enums(openweather, openmeteo)
 // @Success      200      {object}  responses.SuccessResponse[[]weather.DailyForecast]
 // @Failure      400      {object}  responses.StatusResponse
 // @Failure      500      {object}  responses.StatusResponse
 // @Router       /weather/forecast [get]
 func (h *WeatherHandler) HandleGetForecast(c *gin.Context) {
-	// TODO: реализация будет позже
-	c.JSON(501, responses.StatusResponse{Code: 501, Message: "not implemented"})
+	latStr := c.Query("lat")
+	lonStr := c.Query("lon")
+	providerParam := c.Query("provider")
+
+	if latStr == "" || lonStr == "" {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "missing coordinates"})
+		return
+	}
+
+	if providerParam == "" {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "missing provider parameter"})
+		return
+	}
+
+	lat, errLat := decimal.NewFromString(latStr)
+	lon, errLon := decimal.NewFromString(lonStr)
+
+	if errLat != nil || errLon != nil {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "invalid coordinates"})
+		return
+	}
+
+	providerParam = strings.ToLower(providerParam)
+
+	var weatherClient clients.WeatherDataClient
+
+	switch providerParam {
+	case "openmeteo":
+		weatherClient = clients.NewOpenMeteoClient(
+			utils.GetEnv("OPENMETEO_BASE_URL", "https://api.open-meteo.com/v1/forecast"),
+		)
+	case "openweather":
+		weatherClient = clients.NewOpenWeatherClient(
+			utils.GetEnv("OPENWEATHER_API_KEY", ""),
+			"https://api.openweathermap.org",
+		)
+	default:
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "unknown provider: " + providerParam})
+		return
+	}
+
+	controller := controllers.NewCurrentWeatherController(weatherClient)
+	forecast, err := controller.GetForecast(lat, lon)
+
+	if err != nil {
+		c.JSON(500, responses.StatusResponse{Code: 500, Message: err.Error()})
+		return
+	}
+
+	c.JSON(200, responses.SuccessResponse[[]weather.DailyForecast]{
+		Code:    200,
+		Message: "Success",
+		Data:    forecast,
+	})
 }

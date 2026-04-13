@@ -28,3 +28,11 @@ func (c *CurrentWeatherController[T]) GetCurrentWeather(lat decimal.Decimal, lon
 		Temperature: temperature,
 	}, nil
 }
+
+func (c *CurrentWeatherController[T]) GetForecast(lat decimal.Decimal, lon decimal.Decimal) ([]weather.DailyForecast, error) {
+	forecast, err := c.Client.LocationForecast(lat, lon)
+	if err != nil {
+		return nil, err
+	}
+	return forecast, nil
+}

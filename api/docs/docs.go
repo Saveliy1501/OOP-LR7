@@ -75,6 +75,67 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/weather/forecast": {
+            "get": {
+                "description": "Returns weather forecast for 5 days",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "weather"
+                ],
+                "summary": "Get Weather Forecast",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "53.9",
+                        "description": "Latitude",
+                        "name": "lat",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "27.5667",
+                        "description": "Longitude",
+                        "name": "lon",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "openweather",
+                            "openmeteo"
+                        ],
+                        "type": "string",
+                        "description": "Weather provider",
+                        "name": "provider",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.SuccessResponse-array_models_weather_DailyForecast"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.StatusResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.StatusResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -86,11 +147,48 @@ const docTemplate = `{
                 }
             }
         },
+        "models_weather.DailyForecast": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "max_temperature": {
+                    "type": "number"
+                },
+                "min_temperature": {
+                    "type": "number"
+                },
+                "temperature": {
+                    "type": "number"
+                }
+            }
+        },
         "shared_responses.StatusResponse": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "shared_responses.SuccessResponse-array_models_weather_DailyForecast": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_weather.DailyForecast"
+                    }
                 },
                 "message": {
                     "type": "string"

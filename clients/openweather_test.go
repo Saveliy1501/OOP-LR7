@@ -178,7 +178,7 @@ func TestOpenWeatherClient_7_ValidURLConstruction(t *testing.T) {
 
     client.LocationCurrentTemperature(lat, lon)
 
-    expected := "/?lat=53.9&lon=27.5667&appid=abc123key&units=metric"
+    expected := "/data/2.5/weather?lat=53.9&lon=27.5667&appid=abc123key&units=metric"
     if capturedURL != expected {
         t.Errorf("Тест 7 НЕ ПРОЙДЕН: ожидался URL %s, получен %s", expected, capturedURL)
     } else {

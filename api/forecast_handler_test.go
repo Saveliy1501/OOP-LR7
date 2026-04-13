@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 // Тест 1: GET /weather/forecast с provider=openweather возвращает 200
 func TestWeatherHandler_1_ForecastOpenWeatherReturns200(t *testing.T) {
+	_ = godotenv.Load("../.env")
 	gin.SetMode(gin.TestMode)
 
 	handler := NewCurrentWeatherHandler()

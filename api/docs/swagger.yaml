@@ -5,10 +5,34 @@ definitions:
       temperature:
         type: number
     type: object
+  models_weather.DailyForecast:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      max_temperature:
+        type: number
+      min_temperature:
+        type: number
+      temperature:
+        type: number
+    type: object
   shared_responses.StatusResponse:
     properties:
       code:
         type: integer
+      message:
+        type: string
+    type: object
+  shared_responses.SuccessResponse-array_models_weather_DailyForecast:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models_weather.DailyForecast'
+        type: array
       message:
         type: string
     type: object
@@ -66,6 +90,48 @@ paths:
           schema:
             $ref: '#/definitions/shared_responses.StatusResponse'
       summary: Get Current Weather
+      tags:
+      - weather
+  /weather/forecast:
+    get:
+      description: Returns weather forecast for 5 days
+      parameters:
+      - default: "53.9"
+        description: Latitude
+        in: query
+        name: lat
+        required: true
+        type: string
+      - default: "27.5667"
+        description: Longitude
+        in: query
+        name: lon
+        required: true
+        type: string
+      - description: Weather provider
+        enum:
+        - openweather
+        - openmeteo
+        in: query
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared_responses.SuccessResponse-array_models_weather_DailyForecast'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shared_responses.StatusResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/shared_responses.StatusResponse'
+      summary: Get Weather Forecast
       tags:
       - weather
 swagger: "2.0"
