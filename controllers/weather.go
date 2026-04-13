@@ -36,3 +36,8 @@ func (c *CurrentWeatherController[T]) GetForecast(lat decimal.Decimal, lon decim
 	}
 	return forecast, nil
 }
+
+func (c *CurrentWeatherController[T]) GetMultipleCurrentWeather(locations []weather.Location) []weather.LocationWeather {
+	// Заглушка для RED стадии
+	return []weather.LocationWeather{}
+}

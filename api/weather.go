@@ -143,3 +143,20 @@ func (h *WeatherHandler) HandleGetForecast(c *gin.Context) {
 		Data:    forecast,
 	})
 }
+
+// HandleGetMultipleLocations 
+// @Summary      Get Weather for Multiple Locations
+// @Description  Returns current temperature for multiple coordinates
+// @Tags         weather
+// @Accept       json
+// @Produce      json
+// @Param        locations body     []weather.Location  true  "Array of locations"
+// @Param        provider  query    string               true  "Weather provider" Enums(openweather, openmeteo)
+// @Success      200       {object}  responses.SuccessResponse[[]weather.LocationWeather]
+// @Failure      400       {object}  responses.StatusResponse
+// @Router       /weather/multiple [post]
+func (h *WeatherHandler) HandleGetMultipleLocations(c *gin.Context) {
+	// ЗАГЛУШКА: возвращаем 501 Not Implemented
+	c.JSON(501, responses.StatusResponse{Code: 501, Message: "not implemented"})
+}
+
