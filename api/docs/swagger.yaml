@@ -18,6 +18,24 @@ definitions:
       temperature:
         type: number
     type: object
+  models_weather.Location:
+    properties:
+      lat:
+        type: number
+      lon:
+        type: number
+    type: object
+  models_weather.LocationWeather:
+    properties:
+      error:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      temperature:
+        type: number
+    type: object
   shared_responses.StatusResponse:
     properties:
       code:
@@ -32,6 +50,17 @@ definitions:
       data:
         items:
           $ref: '#/definitions/models_weather.DailyForecast'
+        type: array
+      message:
+        type: string
+    type: object
+  shared_responses.SuccessResponse-array_models_weather_LocationWeather:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models_weather.LocationWeather'
         type: array
       message:
         type: string
@@ -132,6 +161,42 @@ paths:
           schema:
             $ref: '#/definitions/shared_responses.StatusResponse'
       summary: Get Weather Forecast
+      tags:
+      - weather
+  /weather/multiple:
+    post:
+      consumes:
+      - application/json
+      description: Returns current temperature for multiple coordinates
+      parameters:
+      - description: Array of locations
+        in: body
+        name: locations
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models_weather.Location'
+          type: array
+      - description: Weather provider
+        enum:
+        - openweather
+        - openmeteo
+        in: query
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared_responses.SuccessResponse-array_models_weather_LocationWeather'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shared_responses.StatusResponse'
+      summary: Get Weather for Multiple Locations
       tags:
       - weather
 swagger: "2.0"

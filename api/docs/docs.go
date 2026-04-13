@@ -136,6 +136,60 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/weather/multiple": {
+            "post": {
+                "description": "Returns current temperature for multiple coordinates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "weather"
+                ],
+                "summary": "Get Weather for Multiple Locations",
+                "parameters": [
+                    {
+                        "description": "Array of locations",
+                        "name": "locations",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models_weather.Location"
+                            }
+                        }
+                    },
+                    {
+                        "enum": [
+                            "openweather",
+                            "openmeteo"
+                        ],
+                        "type": "string",
+                        "description": "Weather provider",
+                        "name": "provider",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.SuccessResponse-array_models_weather_LocationWeather"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.StatusResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -167,6 +221,34 @@ const docTemplate = `{
                 }
             }
         },
+        "models_weather.Location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number"
+                },
+                "lon": {
+                    "type": "number"
+                }
+            }
+        },
+        "models_weather.LocationWeather": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lon": {
+                    "type": "number"
+                },
+                "temperature": {
+                    "type": "number"
+                }
+            }
+        },
         "shared_responses.StatusResponse": {
             "type": "object",
             "properties": {
@@ -188,6 +270,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models_weather.DailyForecast"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "shared_responses.SuccessResponse-array_models_weather_LocationWeather": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_weather.LocationWeather"
                     }
                 },
                 "message": {

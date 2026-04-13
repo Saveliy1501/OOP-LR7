@@ -156,7 +156,51 @@ func (h *WeatherHandler) HandleGetForecast(c *gin.Context) {
 // @Failure      400       {object}  responses.StatusResponse
 // @Router       /weather/multiple [post]
 func (h *WeatherHandler) HandleGetMultipleLocations(c *gin.Context) {
-	// ЗАГЛУШКА: возвращаем 501 Not Implemented
-	c.JSON(501, responses.StatusResponse{Code: 501, Message: "not implemented"})
+	var locations []weather.Location
+
+	if err := c.ShouldBindJSON(&locations); err != nil {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "invalid request: " + err.Error()})
+		return
+	}
+
+	if len(locations) == 0 {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "no locations provided"})
+		return
+	}
+
+	providerParam := c.Query("provider")
+	if providerParam == "" {
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "missing provider parameter"})
+		return
+	}
+
+	providerParam = strings.ToLower(providerParam)
+
+	var weatherClient clients.WeatherDataClient
+
+	switch providerParam {
+	case "openmeteo":
+		weatherClient = clients.NewOpenMeteoClient(
+			utils.GetEnv("OPENMETEO_BASE_URL", "https://api.open-meteo.com/v1/forecast"),
+		)
+	case "openweather":
+		weatherClient = clients.NewOpenWeatherClient(
+			utils.GetEnv("OPENWEATHER_API_KEY", ""),
+			"https://api.openweathermap.org",
+		)
+	default:
+		c.JSON(400, responses.StatusResponse{Code: 400, Message: "unknown provider: " + providerParam})
+		return
+	}
+
+	controller := controllers.NewCurrentWeatherController(weatherClient)
+	results := controller.GetMultipleCurrentWeather(locations)
+
+	// 6. Отправляем ответ
+	c.JSON(200, responses.SuccessResponse[[]weather.LocationWeather]{
+		Code:    200,
+		Message: "Success",
+		Data:    results,
+	})
 }
 
