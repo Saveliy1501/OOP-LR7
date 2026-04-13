@@ -76,6 +76,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/weather/city": {
+            "get": {
+                "description": "Returns current weather for a city (Минск, Лондон, Токио, Шанхай, Варшава)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "weather"
+                ],
+                "summary": "Get Weather by City Name",
+                "parameters": [
+                    {
+                        "enum": [
+                            "Минск",
+                            "Лондон",
+                            "Токио",
+                            "Шанхай",
+                            "Варшава"
+                        ],
+                        "type": "string",
+                        "description": "City name",
+                        "name": "city",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "openweather",
+                            "openmeteo"
+                        ],
+                        "type": "string",
+                        "description": "Weather provider",
+                        "name": "provider",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.SuccessResponse-models_weather_CurrentWeather"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.StatusResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/shared_responses.StatusResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/weather/forecast": {
             "get": {
                 "description": "Returns weather forecast for 5 days",

@@ -121,6 +121,48 @@ paths:
       summary: Get Current Weather
       tags:
       - weather
+  /weather/city:
+    get:
+      description: Returns current weather for a city (Минск, Лондон, Токио, Шанхай,
+        Варшава)
+      parameters:
+      - description: City name
+        enum:
+        - Минск
+        - Лондон
+        - Токио
+        - Шанхай
+        - Варшава
+        in: query
+        name: city
+        required: true
+        type: string
+      - description: Weather provider
+        enum:
+        - openweather
+        - openmeteo
+        in: query
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared_responses.SuccessResponse-models_weather_CurrentWeather'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shared_responses.StatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shared_responses.StatusResponse'
+      summary: Get Weather by City Name
+      tags:
+      - weather
   /weather/forecast:
     get:
       description: Returns weather forecast for 5 days
